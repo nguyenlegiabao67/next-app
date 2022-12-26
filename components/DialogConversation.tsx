@@ -7,7 +7,8 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { addDoc, collection } from "firebase/firestore";
+import { useCollection } from "react-firebase-hooks/firestore";
+import { addDoc, collection, query, where } from "firebase/firestore";
 import * as EmailValidator from "email-validator";
 import { auth, db } from "../config/firebase";
 
@@ -21,16 +22,25 @@ const DialogConversation = ({ open, onClose }: Props) => {
   const [recipientmail, setRecipientEmail] = React.useState("");
   const [errorEmail, setErrorEmail] = React.useState("");
 
-  const handleClose = () => {
-    setRecipientEmail("");
-    setErrorEmail("");
-    onClose();
-  };
-
   const isInvitedSelf = recipientmail === user?.email;
+  const isRecipientAlready = (recipient: string) =>
+    conversationSnapshot?.docs.find((conv) =>
+      conv.data()?.users?.includes(recipient)
+    );
+
+  const queryRecipientExisted = query(
+    collection(db, "conversations"),
+    where("users", "array-contains", user?.email)
+  );
+
+  const [conversationSnapshot] = useCollection(queryRecipientExisted);
 
   const handleAddNewEmail = async () => {
     setErrorEmail("");
+    if (isRecipientAlready(recipientmail)) {
+      setErrorEmail("Email is exist!!");
+      return;
+    }
     if (EmailValidator.validate(recipientmail) && !isInvitedSelf) {
       try {
         await addDoc(collection(db, "conversations"), {
@@ -45,6 +55,12 @@ const DialogConversation = ({ open, onClose }: Props) => {
         "Please verify email address or you are invitting yourself!!!"
       );
     }
+  };
+
+  const handleClose = () => {
+    setRecipientEmail("");
+    setErrorEmail("");
+    onClose();
   };
 
   return (
@@ -65,7 +81,7 @@ const DialogConversation = ({ open, onClose }: Props) => {
         />
         {errorEmail ? (
           <DialogContentText className="text-[14px] text-red-500">
-            Please enter your email address here. We will add new email.
+            {errorEmail}
           </DialogContentText>
         ) : null}
       </DialogContent>
