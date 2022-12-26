@@ -9,7 +9,7 @@ import InputBase from "@mui/material/InputBase";
 import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
 import { Button } from "@mui/material";
-import { useSignOut } from "react-firebase-hooks/auth";
+import { useAuthState, useSignOut } from "react-firebase-hooks/auth";
 import { auth } from "../config/firebase";
 import DialogConversation from "./DialogConversation";
 
@@ -42,13 +42,20 @@ const SidebarAvatar = styled(Avatar)`
 
 const Sidebar = () => {
   const [signOut, loading, error] = useSignOut(auth);
+  const [user] = useAuthState(auth);
   const [openDialog, setOpenDialog] = React.useState(false);
   return (
     <>
       <SidebarContainer>
         <SidebarHeader>
-          <Tooltip title={"email@email.com"} placement={"right"}>
-            <SidebarAvatar>BN</SidebarAvatar>
+          <Tooltip title={`${user?.email}`} placement={"right"}>
+            {user?.photoURL ? (
+              <SidebarAvatar src={user.photoURL} />
+            ) : (
+              <SidebarAvatar>
+                {user?.email?.[0] ? user?.email?.[0].toUpperCase() : ""}
+              </SidebarAvatar>
+            )}
           </Tooltip>
           <div className="mr-2 flex gap-2">
             <IconButton>

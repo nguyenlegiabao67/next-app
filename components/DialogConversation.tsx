@@ -6,6 +6,10 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { addDoc, collection } from "firebase/firestore";
+import * as EmailValidator from "email-validator";
+import { auth, db } from "../config/firebase";
 
 interface Props {
   open: boolean;
@@ -13,15 +17,34 @@ interface Props {
 }
 
 const DialogConversation = ({ open, onClose }: Props) => {
-  const [email, setEmail] = React.useState("");
+  const [user] = useAuthState(auth);
+  const [recipientmail, setRecipientEmail] = React.useState("");
+  const [errorEmail, setErrorEmail] = React.useState("");
 
   const handleClose = () => {
-    setEmail("");
+    setRecipientEmail("");
+    setErrorEmail("");
     onClose();
   };
 
-  const handleAddNewEmail = () => {
-    onClose();
+  const isInvitedSelf = recipientmail === user?.email;
+
+  const handleAddNewEmail = async () => {
+    setErrorEmail("");
+    if (EmailValidator.validate(recipientmail) && !isInvitedSelf) {
+      try {
+        await addDoc(collection(db, "conversations"), {
+          users: [user?.email, recipientmail],
+        });
+      } catch (error) {
+        console.log("Error Add Conversations: ", error);
+      }
+      handleClose();
+    } else {
+      setErrorEmail(
+        "Please verify email address or you are invitting yourself!!!"
+      );
+    }
   };
 
   return (
@@ -37,9 +60,14 @@ const DialogConversation = ({ open, onClose }: Props) => {
           type="email"
           fullWidth
           variant="standard"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          value={recipientmail}
+          onChange={(e) => setRecipientEmail(e.target.value)}
         />
+        {errorEmail ? (
+          <DialogContentText className="text-[14px] text-red-500">
+            Please enter your email address here. We will add new email.
+          </DialogContentText>
+        ) : null}
       </DialogContent>
       <DialogActions>
         <Button className="font-bold text-[18px]" onClick={handleClose}>
