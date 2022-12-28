@@ -5,6 +5,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db } from "../config/firebase";
 import { collection, query, Timestamp, where } from "firebase/firestore";
 import { useCollection } from "react-firebase-hooks/firestore";
+import { useRouter } from "next/router";
 
 const ConversationContainer = styled.div`
   display: flex;
@@ -32,6 +33,7 @@ const ConversationSelect = ({
   id: string;
   conversationUsers: any;
 }) => {
+  const router = useRouter();
   const [userLoggedIn] = useAuthState(auth);
   const getRecipient = (users: string[]) =>
     users.find((user) => user !== (userLoggedIn?.email as string));
@@ -46,8 +48,12 @@ const ConversationSelect = ({
     | AppUser
     | undefined;
 
+  const handleClick = () => {
+    router.push(`/conversation/${id}`);
+  };
+
   return (
-    <ConversationContainer>
+    <ConversationContainer onClick={handleClick}>
       {getRecipientInfo && getRecipientInfo?.photoURL ? (
         <Avatar src={getRecipientInfo?.photoURL} />
       ) : (
