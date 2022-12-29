@@ -1,6 +1,6 @@
-import * as React from "react";
-import Head from "next/head";
-import Sidebar from "../components/Sidebar";
+import * as React from 'react';
+import Head from 'next/head';
+import Sidebar from '../components/Sidebar';
 
 export default function Home() {
   return (

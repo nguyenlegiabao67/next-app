@@ -1,11 +1,11 @@
-import React from "react";
-import styled from "styled-components";
-import Avatar from "@mui/material/Avatar";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth, db } from "../config/firebase";
-import { collection, query, Timestamp, where } from "firebase/firestore";
-import { useCollection } from "react-firebase-hooks/firestore";
-import { useRouter } from "next/router";
+import React from 'react';
+import styled from 'styled-components';
+import Avatar from '@mui/material/Avatar';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth, db } from '../config/firebase';
+import { collection, query, Timestamp, where } from 'firebase/firestore';
+import { useCollection } from 'react-firebase-hooks/firestore';
+import { useRouter } from 'next/router';
 
 const ConversationContainer = styled.div`
   display: flex;
@@ -26,27 +26,15 @@ interface AppUser {
   photoURL: string;
 }
 
-const ConversationSelect = ({
-  id,
-  conversationUsers,
-}: {
-  id: string;
-  conversationUsers: any;
-}) => {
+const ConversationSelect = ({ id, conversationUsers }: { id: string; conversationUsers: any }) => {
   const router = useRouter();
   const [userLoggedIn] = useAuthState(auth);
-  const getRecipient = (users: string[]) =>
-    users.find((user) => user !== (userLoggedIn?.email as string));
+  const getRecipient = (users: string[]) => users.find((user) => user !== (userLoggedIn?.email as string));
 
-  const queryRecipientInfo = query(
-    collection(db, "users"),
-    where("email", "==", getRecipient(conversationUsers))
-  );
+  const queryRecipientInfo = query(collection(db, 'users'), where('email', '==', getRecipient(conversationUsers)));
 
   const [recipientInfoSnapshot] = useCollection(queryRecipientInfo);
-  const getRecipientInfo = recipientInfoSnapshot?.docs?.[0]?.data() as
-    | AppUser
-    | undefined;
+  const getRecipientInfo = recipientInfoSnapshot?.docs?.[0]?.data() as AppUser | undefined;
 
   const handleClick = () => {
     router.push(`/conversation/${id}`);
@@ -54,11 +42,7 @@ const ConversationSelect = ({
 
   return (
     <ConversationContainer onClick={handleClick}>
-      {getRecipientInfo && getRecipientInfo?.photoURL ? (
-        <Avatar src={getRecipientInfo?.photoURL} />
-      ) : (
-        <Avatar>{getRecipient(conversationUsers)?.[0].toUpperCase()}</Avatar>
-      )}
+      {getRecipientInfo && getRecipientInfo?.photoURL ? <Avatar src={getRecipientInfo?.photoURL} /> : <Avatar>{getRecipient(conversationUsers)?.[0].toUpperCase()}</Avatar>}
       <span>{getRecipient(conversationUsers)}</span>
     </ConversationContainer>
   );
