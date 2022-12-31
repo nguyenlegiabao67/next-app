@@ -17,6 +17,8 @@ import { useCollection } from 'react-firebase-hooks/firestore';
 import ConversationSelect from './ConversationSelect';
 
 const SidebarContainer = styled.div`
+  position: sticky;
+  top: 0;
   height: 100vh;
   width: 320px;
   display: flex;

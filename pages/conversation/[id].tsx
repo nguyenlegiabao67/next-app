@@ -9,6 +9,7 @@ import { Conversation, IMessage } from '../../utils/types';
 import { getRecipientEmail } from '../../utils/getRecipientEmail';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { generateQueryGetMessages, transformMessage } from '../../utils/query';
+import ConversationScreen from '../../components/ConversationScreen';
 
 const StyledContainer = styled.div`
   display: flex;
@@ -27,7 +28,7 @@ const Converstation = ({ conversation, messages }: Props) => {
         <title>Conversation {getRecipientEmail(conversation.users, loggedInUser)}</title>
       </Head>
       <Sidebar />
-      <h1>{getRecipientEmail(conversation.users, loggedInUser)}</h1>
+      <ConversationScreen conversation={conversation} messages={messages}></ConversationScreen>
     </StyledContainer>
   );
 };
