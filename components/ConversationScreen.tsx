@@ -48,7 +48,7 @@ const StyledHeaderInfo = styled.div`
 const StyledMessagesContainer = styled.div`
   padding: 30px;
   background-color: #e5ded8;
-  min-height: 90%;
+  min-height: 85%;
 `;
 
 const StyledInputContainer = styled.form`
@@ -67,7 +67,7 @@ const StyledInput = styled.input`
   border: none;
   border-radius: 10px;
   background-color: whitesmoke;
-  padding: 0 15px;
+  padding: 5px 15px;
   margin-left: 15px;
   margin-right: 15px;
 `;
